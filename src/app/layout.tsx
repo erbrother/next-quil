@@ -3,7 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
-
+import { AuthProvider } from "@/components/AuthProvider";
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -27,6 +27,7 @@ export default function RootLayout({
 
 }>) {
   return (
+    <AuthProvider>
     <html lang="en">
       <body
         className={cn(
@@ -39,5 +40,6 @@ export default function RootLayout({
         {children}
       </body>
     </html>
+    </AuthProvider>
   );
 }
