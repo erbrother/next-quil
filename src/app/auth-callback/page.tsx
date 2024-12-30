@@ -1,5 +1,8 @@
-import {useRouter, useSearchParams } from 'next/navigation'
+'use client'
+
+import { useRouter, useSearchParams } from 'next/navigation'
 import { trpc } from '../_trpc/client'
+import { Loader2 } from 'lucide-react'
 
 const Page = () => {
   const router = useRouter()
@@ -7,12 +10,28 @@ const Page = () => {
   const searchParams = useSearchParams()
   const origin = searchParams.get('origin')
 
-  const {data} = trpc.authCallback.useQuery()
+  const { data, error } = trpc.authCallback.useQuery(undefined, {
+    retry: true,
+    retryDelay: 500, // 500ms retry
+  })
+
+  if (error?.data?.code === 'UNAUTHORIZED') {
+    router.push("sign-in")
+  }
 
   if (data?.success) {
-      // user is synced to db
-      router.push(origin ? `/${origin}` : '/dashboard')
+    // user is synced to db
+    router.push(origin ? `/${origin}` : '/dashboard')
   }
+
+  return (
+    <div className='w-full mt-24 flex justify-center'>
+      <div className="flex flex-col items-center gap-2">
+        <Loader2 className='h-8 w-8 animate-spin text-zinc-800'></Loader2>
+        <h3>Setting up your count</h3>
+      </div>
+    </div>
+  )
 }
 
 
