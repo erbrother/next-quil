@@ -1,7 +1,15 @@
+'use client'
+import UploadButton from "./UploadButton";
+
 const Dashboard = () => {
   return (
-    <div>hello world</div>
-  )
-}
+    <div>
+      <div>upload your file</div>
+      <div>
+        <UploadButton></UploadButton>
+      </div>
+    </div>
+  );
+};
 
-export default Dashboard
+export default Dashboard;
