@@ -7,6 +7,7 @@ import { AuthProvider } from "@/components/AuthProvider";
 import Providers from "@/components/Provider";
 
 import "react-loading-skeleton/dist/skeleton.css"
+import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -40,6 +41,7 @@ export default function RootLayout({
               geistMono.variable
             )}
           >
+            <Toaster></Toaster>
             <Navbar></Navbar>
             {children}
           </body>
