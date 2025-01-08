@@ -7,6 +7,7 @@ import { AuthProvider } from "@/components/AuthProvider";
 import Providers from "@/components/Provider";
 
 import "react-loading-skeleton/dist/skeleton.css"
+import 'simplebar-react/dist/simplebar.min.css'
 import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = localFont({
