@@ -1,6 +1,11 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { db } from "@/db";
+import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
+import { pinecone } from "@/lib/pinecone";
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { PineconeStore } from "@langchain/pinecone";
+import { HttpsProxyAgent } from 'https-proxy-agent';
 const f = createUploadthing();
 
 
@@ -33,7 +38,7 @@ export const ourFileRouter = {
           key: file.key,
         },
       })
-    
+
       if (isFileExist) return
     
       const createdFile = await db.file.create({
@@ -45,6 +50,57 @@ export const ourFileRouter = {
           uploadStatus: 'PROCESSING',
         },
       })
+
+      try {
+        const response = await fetch(file.url)
+        const blob = await response.blob()
+        const loader = new PDFLoader(blob)
+
+        const pageLevelDocs = await loader.load();
+
+        console.log('pageLevelDocs:', pageLevelDocs)
+
+        // const pageAmt = pageLevelDocs.length
+        
+        // vectorize and index entire document
+        const pineconeIndex = pinecone.Index('quill')
+
+        const proxyAgent = new HttpsProxyAgent('http://127.0.0.1:7890');
+        
+        // 访问API需要设置代理
+        const embeddings = new OpenAIEmbeddings({
+          apiKey: process.env.OPENAI_API_KEY,
+          configuration:{
+            httpAgent: proxyAgent
+          }
+        });
+
+        await PineconeStore.fromDocuments(pageLevelDocs, embeddings, {
+          pineconeIndex,
+          namespace: createdFile.id
+        })
+
+        await db.file.update({
+          data: {
+            uploadStatus: 'SUCCESS'
+          },
+          where :{
+            id: createdFile.id
+          }
+        })
+
+      } catch (error) {
+        console.error(`document Pdf upload error`, error)
+        await db.file.update({
+          data: {
+            uploadStatus: 'FAILED'
+          },
+          where :{
+            id: createdFile.id
+          }
+        })
+      }
+
     }),
 } satisfies FileRouter;
 
