@@ -10,6 +10,7 @@
     "studio": "npx prisma studio"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^1.1.0",
     "@hookform/resolvers": "^3.10.0",
     "@kinde-oss/kinde-auth-nextjs": "^2.4.6",
     "@langchain/community": "^0.3.24",
@@ -29,6 +30,7 @@
     "@trpc/react-query": "^11.0.0-rc.660",
     "@trpc/server": "^11.0.0-rc.660",
     "@uploadthing/react": "^7.1.5",
+    "ai": "^4.1.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -36,6 +38,7 @@
     "langchain": "^0.3.11",
     "lucide-react": "^0.462.0",
     "next": "15.0.3",
+    "openai": "^4.79.1",
     "pdf-parse": "^1.1.1",
     "pdfjs-dist": "4.8.69",
     "react": "19.0.0-rc-66855b96-20241106",
