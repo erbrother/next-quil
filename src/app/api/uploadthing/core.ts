@@ -6,6 +6,7 @@ import { pinecone } from "@/lib/pinecone";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { PineconeStore } from "@langchain/pinecone";
 import { HttpsProxyAgent } from 'https-proxy-agent';
+import { openaiEmbeddings } from "@/lib/openai";
 const f = createUploadthing();
 
 
@@ -65,15 +66,9 @@ export const ourFileRouter = {
         // vectorize and index entire document
         const pineconeIndex = pinecone.Index('quill')
 
-        const proxyAgent = new HttpsProxyAgent('http://127.0.0.1:7890');
         
         // 访问API需要设置代理
-        const embeddings = new OpenAIEmbeddings({
-          apiKey: process.env.OPENAI_API_KEY,
-          configuration:{
-            httpAgent: proxyAgent
-          }
-        });
+        const embeddings = openaiEmbeddings
 
         await PineconeStore.fromDocuments(pageLevelDocs, embeddings, {
           pineconeIndex,

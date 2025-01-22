@@ -2,11 +2,11 @@ import { db } from "@/db"
 import { pinecone } from "@/lib/pinecone"
 import { SendMessageValidator } from "@/lib/validators/SendMessageValidator"
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server"
-import { OpenAIEmbeddings } from "@langchain/openai"
 import { PineconeStore } from "@langchain/pinecone"
 import { NextRequest } from "next/server"
-import { openai } from '@ai-sdk/openai';
+import { createOpenAI  } from '@ai-sdk/openai';
 import { streamText } from 'ai';
+import { openaiEmbeddings } from "@/lib/openai"
 
 export const POST = async (req: NextRequest) => {
   const body = await req.json()
@@ -41,9 +41,7 @@ export const POST = async (req: NextRequest) => {
     },
   })
 
-  const embeddings = new OpenAIEmbeddings({
-    openAIApiKey: process.env.OPENAI_API_KEY
-  })
+  const embeddings = openaiEmbeddings
 
   const pineconeIndex = pinecone.Index('quill')
 
@@ -64,12 +62,22 @@ export const POST = async (req: NextRequest) => {
     take: 6
   })
 
+  console.log('results:', results)
+
+  console.log('prevMessages', prevMessages)
+
   const formattedPrevMessages = prevMessages.map((msg) => ({
     role: msg.isUserMessage ? "user" : "assistant",
     content: msg.text
   }))
 
-  const { toDataStreamResponse } = streamText({
+  const openai = createOpenAI({
+    baseURL: 'https://api.openai-proxy.com/v1',
+    // custom settings, e.g.
+    compatibility: 'strict', // strict mode, enable when using the OpenAI API
+  });
+
+  const result = streamText({
     model: openai('gpt-3.5-turbo'),
     temperature: 0,
     messages: [
@@ -100,7 +108,9 @@ export const POST = async (req: NextRequest) => {
         USER INPUT: ${message}`,
       },
     ],
-    onFinish: async ({ text }) => {
+    onFinish:async ({ text, response }) => {
+      console.log('=================')
+      console.log('text======', response.messages)
       await db.message.create({
         data: {
           text: text,
@@ -112,6 +122,16 @@ export const POST = async (req: NextRequest) => {
     }
   })
 
-  return toDataStreamResponse()
+  let completeText = ''
+  for await (const text of result.textStream) {
+    console.log('text', text)
+    completeText += text
+  }
+
+  console.log('streamTextRes', result)
+
+  return new Response(JSON.stringify({
+    text: completeText
+  }))
 
 }
