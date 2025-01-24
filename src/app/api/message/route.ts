@@ -62,9 +62,9 @@ export const POST = async (req: NextRequest) => {
     take: 6
   })
 
-  console.log('results:', results)
+  // console.log('results:', results)
 
-  console.log('prevMessages', prevMessages)
+  // console.log('prevMessages', prevMessages)
 
   const formattedPrevMessages = prevMessages.map((msg) => ({
     role: msg.isUserMessage ? "user" : "assistant",
@@ -108,9 +108,9 @@ export const POST = async (req: NextRequest) => {
         USER INPUT: ${message}`,
       },
     ],
-    onFinish:async ({ text, response }) => {
-      console.log('=================')
-      console.log('text======', response.messages)
+    onFinish:async ({ text }) => {
+      // console.log('=================')
+      // console.log('text======', response.messages)
       await db.message.create({
         data: {
           text: text,
@@ -124,11 +124,11 @@ export const POST = async (req: NextRequest) => {
 
   let completeText = ''
   for await (const text of result.textStream) {
-    console.log('text', text)
+    // console.log('text', text)
     completeText += text
   }
 
-  console.log('streamTextRes', result)
+  // console.log('streamTextRes', result)
 
   return new Response(JSON.stringify({
     text: completeText
