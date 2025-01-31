@@ -3,9 +3,7 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { db } from "@/db";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { pinecone } from "@/lib/pinecone";
-import { OpenAIEmbeddings } from "@langchain/openai";
 import { PineconeStore } from "@langchain/pinecone";
-import { HttpsProxyAgent } from 'https-proxy-agent';
 import { openaiEmbeddings } from "@/lib/openai";
 const f = createUploadthing();
 
@@ -24,7 +22,7 @@ export const ourFileRouter = {
     },
   })
     // Set permissions and file types for this FileRoute
-    .middleware(async ({ req }) => {
+    .middleware(async ({  }) => {
       const { getUser } = getKindeServerSession()
       const user = await getUser()
     
