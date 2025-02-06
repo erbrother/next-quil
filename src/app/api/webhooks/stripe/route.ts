@@ -24,8 +24,7 @@ export async function POST(request: Request) {
     )
   }
 
-  const session = event.data
-    .object as Stripe.Checkout.Session
+  const session = event.data.object as Stripe.Checkout.Session
 
   if (!session?.metadata?.userId) {
     return new Response(null, {
@@ -41,12 +40,12 @@ export async function POST(request: Request) {
 
     await db.user.update({
       where: {
-        id: session.metadata.userId,
+        id: session.metadata.userId!,
       },
       data: {
-        stripeSubscriptionId: subscription.id,
+        stripeSubscriptionId: subscription?.id,
         stripeCustomerId: subscription.customer as string,
-        stripePriceId: subscription.items.data[0]?.price.id,
+        stripePriceId: subscription.items.data[0]?.price?.id,
         stripeCurrentPeriodEnd: new Date(
           subscription.current_period_end * 1000
         ),
@@ -63,10 +62,10 @@ export async function POST(request: Request) {
 
     await db.user.update({
       where: {
-        stripeSubscriptionId: subscription.id,
+        stripeSubscriptionId: subscription?.id,
       },
       data: {
-        stripePriceId: subscription.items.data[0]?.price.id,
+        stripePriceId: subscription.items.data[0]?.price?.id,
         stripeCurrentPeriodEnd: new Date(
           subscription.current_period_end * 1000
         ),

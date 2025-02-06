@@ -9,6 +9,7 @@ import Providers from "@/components/Provider";
 import "react-loading-skeleton/dist/skeleton.css"
 import 'simplebar-react/dist/simplebar.min.css'
 import { Toaster } from "@/components/ui/toaster";
+import { Suspense } from "react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -44,7 +45,9 @@ export default function RootLayout({
           >
             <Toaster></Toaster>
             <Navbar></Navbar>
-            {children}
+            <Suspense>
+              {children}
+            </Suspense>
           </body>
         </Providers>
       </html>
